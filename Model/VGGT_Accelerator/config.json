@@ -1,0 +1,41 @@
+{
+    "method": "attn",
+    "method_dim": [
+        1024,
+        32,
+        1
+    ],
+    "method_act": "none",
+    "train_set": "tartanair",
+    "probe_loc": [
+        "DINO",
+        15
+    ],
+    "train_batch_size": 10,
+    "train_sequence_l": 32,
+    "train_learn_rate": 0.001,
+    "train_infer_size": [
+        [
+            378,
+            504
+        ]
+    ],
+    "train_optim_step": 2000,
+    "train_augment_\u03c0": true,
+    "train_augment_l": true,
+    "train_supervise": "depth_conf",
+    "train_loss_func": "pairwise-rank",
+    "train_save_freq": 250,
+    "train_scheduler": [
+        "linear",
+        0.001,
+        1e-05,
+        750,
+        1250
+    ],
+    "wandb_log_freq": 10,
+    "wandb_entity": "pyramid-infer",
+    "wandb_project": "VGGT-ConfDistill-Sep17",
+    "resume_run": null,
+    "resume_step": null
+}

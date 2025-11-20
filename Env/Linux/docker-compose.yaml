@@ -1,0 +1,98 @@
+services:
+  linux-cuda12-dev:
+    image: yutianchen/co-me-tokens:linux-cu128-2025-11-v1
+
+    # Build from the Dockerfile in this directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE          : "nvcr.io/nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04"
+        TORCH_VERSION       : "2.7.0+cu128"
+        TORCH_VISION_VERSION: "0.22.0+cu128"
+        TORCH_INDEX         : "https://download.pytorch.org/whl/cu128"
+
+    volumes:
+      - ../../:/workspace
+      - /home/yutianch/Data/PyramidInfer/Model/:/Model/
+      - /home/yutianch/Data/PyramidInfer/Result:/Result/
+
+    working_dir: /workspace
+
+    # Ask Docker to give this container access to all GPUs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Keep the container running in interactive mode
+    stdin_open: true
+    tty: true
+    # Add admin previledge so it works with Nsight system etc.
+    cap_add:
+      - SYS_ADMIN
+    privileged: true
+
+    # In case of camera attachment (e.g. Zed)
+    devices:
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
+
+    # Extra environment variables for CUDA or Python:
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONUNBUFFERED=1
+
+
+  linux-cuda13-dev:
+    image: yutianchen/co-me-tokens:linux-cu130-2025-11-v1
+
+    # Build from the Dockerfile in this directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE          : "nvcr.io/nvidia/cuda:13.0.2-cudnn-devel-ubuntu24.04"
+        TORCH_VERSION       : "2.9.0+cu130"
+        TORCH_VISION_VERSION: "0.24.0+cu130"
+        TORCH_INDEX         : "https://download.pytorch.org/whl/cu130"
+
+    volumes:
+      - ../../:/workspace
+      - /home/yutianch/Data/PyramidInfer/Model/:/Model/
+      - /home/yutianch/Data/PyramidInfer/Result:/Result/
+
+    working_dir: /workspace
+
+    # Ask Docker to give this container access to all GPUs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Keep the container running in interactive mode
+    stdin_open: true
+    tty: true
+
+    # Add admin previledge so it works with Nsight system etc.
+    cap_add:
+      - SYS_ADMIN
+    privileged: true
+
+    # In case of camera attachment (e.g. Zed)
+    devices:
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
+
+    # Extra environment variables for CUDA or Python:
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONUNBUFFERED=1

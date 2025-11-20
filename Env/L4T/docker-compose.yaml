@@ -1,0 +1,44 @@
+services:
+  l4t-thor-cuda13-dev:
+    image: yutianchen/co-me-tokens:l4t-cu130-2025-11-v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - ../../:/workspace
+      - /home/yutianch/Data/PyramidInfer/Model/:/Model/
+      - /home/yutianch/Data/PyramidInfer/Result:/Result/
+
+    devices:
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
+
+    network_mode: "host"
+    ipc: "host"
+    shm_size: "1g"
+
+    working_dir: /workspace
+    runtime: nvidia
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    cap_add:
+      - SYS_ADMIN
+    privileged: true
+
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONUNBUFFERED=1
+
+    command: bash
+    tty: true
+    stdin_open: true
+    user: "root"
