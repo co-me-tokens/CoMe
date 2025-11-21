@@ -33,7 +33,7 @@
 
 ### Docker Environment Setup (Recommended 👍)
 
-We provide the pre-built docker image at [Docker Hub (Link)](https://hub.docker.com/repository/docker/yutianchen/co-me-tokens/general).  
+We provide the pre-built docker image at [Docker Hub (Link)](https://hub.docker.com/r/yutianchen/co-me-tokens).  
 
 ```bash
 # On Linux Platform (x86-64)
