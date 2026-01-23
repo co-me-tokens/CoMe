@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-<image src="https://github.com/user-attachments/assets/1b6440eb-d0ca-4964-a81e-5363f96d82e7" alt="Co-Me Hero Image" width="75%" align="center"/>
+<img width="1503" height="664" alt="image" src="https://github.com/user-attachments/assets/934099c9-38a8-4344-9399-57c7a6c40b69" />
 </p>
 
 ## 📦 Environment & Installation
