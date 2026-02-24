@@ -11,6 +11,9 @@
 <img width="1503" height="664" alt="image" src="https://github.com/user-attachments/assets/934099c9-38a8-4344-9399-57c7a6c40b69" />
 </p>
 
+## 🔥 Updates
+* [Feb 2026] Our work is accepted by the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026. We will present our work at CVPR 2026 in Denver.
+
 ## 📦 Environment & Installation
 
 > [!NOTE]
