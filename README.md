@@ -12,6 +12,14 @@
 </p>
 
 ## 🔥 Updates
+
+> [!NOTE]
+>
+> We are planning to release a new iteration of the repository, providing acceleration on more state-of-the-art geometric vision transformers including: **DepthAnything 3, Pi3, Pi3X.**
+> In addition, the speedup is further boosted with **customized FlashAttention kernel** (no annoying JIT compile and warmup anymore!) with higher token copmression rate. We are also working on a **TensorRT plugin** for custom kernels to maximize the efficiency on edge platforms.
+>
+> If you are interested, please ⭐ our repo and stay tuned!
+
 * [Feb 2026] Our work is accepted by the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026. We will present our work at CVPR 2026 in Denver.
 
 ## 📦 Environment & Installation
