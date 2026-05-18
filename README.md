@@ -8,10 +8,12 @@
 </p>
 
 <p align="center">
-<img width="1503" height="664" alt="image" src="https://github.com/user-attachments/assets/934099c9-38a8-4344-9399-57c7a6c40b69" />
+<img width="960" height="376" alt="Figure1_2026Mar" src="https://github.com/user-attachments/assets/7a115c26-ee34-46d7-a11d-a1d2c60f7b1d" />
 </p>
 
 ## 🔥 Updates
+
+* [May 2026] Co-Me is **FASTER** and **support more models**! With customized flash attn we boost the speedup ratio even more. Co-Me also supports DepthAnything3, Pi3 and Pi3X as well as VGGT and MapAnything (v1.1) now.
 * [Feb 2026] Our work is accepted by the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026. We will present our work at CVPR 2026 in Denver.
 
 ## 📦 Environment & Installation
@@ -31,6 +33,7 @@
 | Docker✅ / Conda✅| Linux + CUDA 13.0     | RTX 5090          |
 | Docker✅ / Conda❓| L4T + CUDA 13.0 | NVIDIA Jetson Thor            |
 | Docker❌ / Conda✅| Windows 11 + CUDA 13.0 + VS2022 | RTX 5070 |
+
 
 > Legend: ✅: Verified support, ❓: Unverified but should support, ❌ Unsupported.
 
