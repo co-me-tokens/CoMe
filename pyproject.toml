@@ -1,0 +1,35 @@
+[tool.pytest.ini_options]
+testpaths = [
+    "./test",
+]
+pythonpath = [
+    "."
+]
+markers = [
+    "local: marks tests that should only run locally (deselect with '-m \"not local\"')",
+    "vio: marks tests that is realted with vio (deselect with '-m \"not vio\"')",
+    "ext_sparse_ba: marks tests that is related with SparseBA optional feature set."
+]
+cache_dir = "./cache/pytest_cache"
+addopts = """-rs --jaxtyping-packages=Src,beartype.beartype \
+    -p no:launch_testing -p no:ament_flake8 -p no:ament_xmllint -p no:launch_ros -p no:ament_copyright \
+    -p no:ament_lint -p no:ament_pep257
+"""
+
+
+[tool.pyright]
+exclude = [
+    "./tools/types",                            # Type Stubs
+    "./src/thirdparty",                         # Third Party Libraries
+    "./src/cuda_extension",                     # CUDA Extensions
+    "./.cursor",                                # Agentic Toolchains
+]
+typeCheckingMode = "standard"
+reportImportCycles = "information"          # Sometime we have to have import cycle to annotate type
+reportDuplicateImport = "error"             # Bad practice.
+reportAbstractUsage = "error"
+reportMatchNotExhaustive = "error"          # Bad practice.
+reportPrivateImportUsage = "information"    # PyTorch (specifically torch.optim) problem
+reportMissingImports = "warning"            # Some module (e.g. Zed SDK) is optional for user.
+reportMissingModuleSource = "none"          # CUDA Extensions can't be resolved from source
+stubPath = "./tools/types"

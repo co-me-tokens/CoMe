@@ -1,0 +1,49 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "cmake>=3.18",
+    "pybind11>=2.10",
+    "torch>=2.0.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zed_loader"
+version = "0.1.0"
+description = "ZED Camera loader with PyTorch/ATen integration and multi-threading support"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "MAC-VO Team"}
+]
+keywords = ["zed", "camera", "pytorch", "stereo", "depth", "imu"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pybind11-stubgen",
+    "pytest",
+]
+
+[tool.setuptools]
+py-modules = []
+

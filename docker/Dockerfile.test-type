@@ -1,0 +1,41 @@
+ARG BASE_IMAGE="nvcr.io/nvidia/pytorch:25.06-py3"
+
+# STAGE 1: The Heavy Source
+# We mount this only to "rob" it of its python source files
+FROM ${BASE_IMAGE} AS base
+
+WORKDIR /export
+
+# The Magic Script:
+# 1. Finds the site-packages directory (adjust python version if needed)
+# 2. Uses 'find' to locate ONLY .py and .pyi files
+# 3. Uses 'cp --parents' to copy them while preserving the folder structure
+# We exclude '__pycache__' to save space.
+# UPDATED FIND COMMAND:
+# 1. Added .pth (Path configuration files)
+# 2. Added .json (Often needed for library configs)
+# 3. Added _rotation.*.so (for scipy.spatial.transform.Rotation, which does not provide pyi stub file.)
+# 4. Added dist-info (Contains metadata that Pyright sometimes checks)
+RUN SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])") && \
+    mkdir -p ./site-packages && \
+    cd "$SITE_PACKAGES" && \
+    find . -type f \( -name "*.py" -o -name "*.pyi" -o -name "*.pth" -o -name "*.json" -o -name "_rotation.*.so" \) \
+    -not -path "*/__pycache__/*" \
+    -exec cp --parents "{}" /export/site-packages/ \;
+
+    
+# STAGE 2: The Lightweight CI Runner
+FROM python:3.12-slim
+
+WORKDIR /workspace
+
+# Install Pyright
+RUN apt-get update && apt-get install -y libatomic1 git && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir pyright
+
+# Copy the "Skeleton" libraries from the heavy image
+# We place them in the standard site-packages of this new container
+COPY --from=base /export/site-packages /usr/local/lib/python3.12/site-packages
+
+# Run Pyright
+CMD ["pyright"]

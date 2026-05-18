@@ -1,0 +1,43 @@
+defaults:
+  - optimizer: adamw
+  - scheduler: cosine_annealing
+  - model: vggt
+  - _self_
+
+device: cuda
+
+train_target: Distill_DepthConf
+
+predictor:
+  inject_block_idx: 14
+  dims: [1024, 128, 1]
+  active: expp1
+  num_register: 0
+
+training:
+  batch_size     : 8
+  mini_batch_size: 2
+  segment_length : 32
+  num_step       : 2000
+  infer_size     : [518, 518]
+  loss_function  : pairwise-rank
+  permute_segment: true
+  crop_segment   : true
+  train_dtype    : bfloat16
+
+checkpoint:
+  output_directory: ${hydra:runtime.output_dir}
+  save_frequency: 500
+  resume_from: null
+
+wandb:
+  enabled: true
+  group: default
+  entity: yutianch_cmu
+  project: "CoMe-Next Confidence Distillation"
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: output/confidence_distill/${hydra:runtime.choices.model}/${now:%Y%m%d_%H%M%S}

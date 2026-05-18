@@ -1,0 +1,55 @@
+services:
+  test-type-jetson:
+    profiles: ["arm64"]
+    platform: linux/arm64
+    image: yutianchen/co-me:linux-static-analysis-arm64
+    working_dir: /workspace
+    
+    build:
+      context: .
+      dockerfile: Dockerfile.test-type
+      args:
+        BASE_IMAGE: yutianchen/co-me:linux-cu126-orin-arm64
+    
+    command: "pyright"
+    volumes:
+      - ../:/workspace
+
+  test-type-cu128:
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-static-analysis-cu128-amd64
+    working_dir: /workspace
+    
+    build:
+      context: .
+      dockerfile: Dockerfile.test-type
+      args:
+        BASE_IMAGE: "yutianchen/co-me:linux-cu128-amd64"
+    
+    volumes:
+      - ../:/workspace
+  
+  test-type-cu130:
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-static-analysis-cu130-amd64
+    working_dir: /workspace
+    
+    build:
+      context: .
+      dockerfile: Dockerfile.test-type
+      args:
+        BASE_IMAGE: "yutianchen/co-me:linux-cu130-amd64"
+
+  test-type-cu126:
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-static-analysis-cu126-amd64
+    working_dir: /workspace
+    
+    build:
+      context: .
+      dockerfile: Dockerfile.test-type
+      args:
+        BASE_IMAGE: "yutianchen/co-me:linux-cu126-amd64"

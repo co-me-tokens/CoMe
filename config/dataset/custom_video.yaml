@@ -1,0 +1,7 @@
+_target_: src.dataset.custom_video.CustomVideo_Dataset
+
+data_root : ./output/media/Golden_Sydney_Opera_House.mp4
+max_length: 32
+device    : ${device}
+step_size : 1
+start     : 0

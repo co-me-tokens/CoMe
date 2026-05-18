@@ -1,0 +1,7 @@
+_target_: src.render.BlenderRenderer
+
+config:
+  point_radius: 0.01
+  downsample_factor: 1
+  emit_mix: 0.35
+  emit_strength: 1.0

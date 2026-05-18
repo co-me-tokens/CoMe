@@ -1,8 +1,0 @@
-defaults:
-  - default
-
-# Optimizer parameters specific to submodules
-submodule_configs:
-  # Encoder
-  encoder:
-    lr: 0

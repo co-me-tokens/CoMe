@@ -1,0 +1,6 @@
+_target_: src.dataset.custom_camera.CameraStreamDataset
+
+cam_id        : 0
+segment_length: 32
+freq_hz       : 12.0
+buffer_size   : 128

@@ -1,0 +1,27 @@
+{
+    "name": "Co-Me Tokens",
+    "dockerComposeFile": [
+      "../docker/docker-compose.yaml",
+      "../tools/docker-compose.user.yaml"
+    ],
+    
+    // This runs the script on your HOST machine before Docker builds
+    "initializeCommand": "./.devcontainer/detect-config.sh",
+  
+    // Point to the single variable-driven service
+    "service": "dev-unified-entry",
+    "workspaceFolder": "/workspace",  
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-python.python", "anysphere.cursorpyright",
+          "ms-vscode.cpptools", "anysphere.cpptools",
+          "ms-vscode.cmake-tools", 
+          "guidotapia2.unicode-math-vscode",
+          "openai.chatgpt"
+        ]
+      }
+    },
+    "shutdownAction": "stopCompose",
+    "composeProjectName": "co-me-tokens"
+  }

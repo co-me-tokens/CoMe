@@ -1,0 +1,15 @@
+defaults:
+  - dataset   : fake_input
+  - model@acc : co_me_fused_vggt_3x3
+  - model@ref : vggt
+  - _self_
+
+device  : cuda
+first_n : 10
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  output_subdir: null

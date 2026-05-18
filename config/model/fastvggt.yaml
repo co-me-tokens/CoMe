@@ -1,0 +1,5 @@
+_target_: src.thirdparty.fastvggt.get_FastVGGT
+
+# Following default configuration of the FastVGGT
+merging    : 0
+merge_ratio: 0.9

@@ -1,0 +1,32 @@
+{
+  "train_target": "Distill_DepthConf",
+  "learning_rate": 0.001,
+  "weight_decay": 0.01,
+  "inject_block_idx": 6,
+  "predictor_dims": [
+    1536,
+    128,
+    1
+  ],
+  "predictor_active": "expp1",
+  "predictor_num_register": 0,
+  "batch_size": 8,
+  "mini_batch_size": 2,
+  "num_step": 2000,
+  "segment_length": 32,
+  "infer_size": [
+    518,
+    518
+  ],
+  "loss_function": "pairwise-rank",
+  "permute_segment": true,
+  "crop_segment": true,
+  "train_dtype": "torch.bfloat16",
+  "output_directory": "/jet/home/ychen20/CoMe-Next/output/confidence_distill/ma/20260325_052534",
+  "save_frequency": 500,
+  "use_wandb": true,
+  "wandb_group": "default",
+  "wandb_entity": "yutianch_cmu",
+  "wandb_project": "CoMe-Next Confidence Distillation",
+  "resume_from": null
+}

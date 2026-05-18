@@ -1,0 +1,147 @@
+# System-level configuration are the same for all develop services
+x-common-config: &common-config
+  hostname: ${HOSTNAME:-co-me}-dev
+  
+  # Mount /dev to give access to all devices (potentially camera stream)
+  volumes:
+    - ../:/workspace
+    - /dev:/dev
+  working_dir: /workspace
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+  stdin_open: true
+  runtime: nvidia
+  tty: true
+
+  # For profiliing in a Docker container
+  cap_add:
+    - SYS_ADMIN
+  privileged: true
+
+  # Sufficient IPC shared memory for PyTorch as instructed in NVIDIA container.
+  ipc: host
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+    stack: 67108864
+
+  # Auxilary environment variables
+  environment:
+    - NVIDIA_DRIVER_CAPABILITIES=all
+    - NVIDIA_VISIBLE_DEVICES=all
+    - PYTHONUNBUFFERED=1
+
+# Per-resource configuration service.
+services:
+  linux-cuda128-dev:
+    <<: *common-config
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-cu128-amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "nvcr.io/nvidia/pytorch:25.03-py3"
+        CUDA_MAJOR_VERSION: "12"
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"
+  
+  linux-cuda126-dev:
+    <<: *common-config
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-cu126-amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "nvcr.io/nvidia/pytorch:24.09-py3"
+        CUDA_MAJOR_VERSION: "12"
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"
+
+  linux-cuda130-dev:
+    <<: *common-config
+    profiles: ["amd64"]
+    platform: linux/amd64
+    image: yutianchen/co-me:linux-cu130-amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "nvcr.io/nvidia/pytorch:25.08-py3"
+        CUDA_MAJOR_VERSION: "13"
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"
+
+  jetson-thor-dev:
+    <<: *common-config
+    profiles: ["arm64"]
+    platform: linux/arm64
+    image: yutianchen/co-me:linux-cu130-thor-arm64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "nvcr.io/nvidia/pytorch:25.08-py3"
+        CUDA_MAJOR_VERSION: "13"
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"
+    
+    # Load stripped nsys module.
+    environment:
+      - PATH=/opt/nvidia/nsight-systems/2025.4.1/bin:/opt/nvidia/nsight-compute/2025.3.0/bin:$PATH
+    
+    volumes:
+      - ../:/workspace
+      - /opt/nvidia/nsight-systems/:/opt/nvidia/nsight-systems/
+      - /opt/nvidia/nsight-compute/:/opt/nvidia/nsight-compute/
+  
+  jetson-orin-dev:
+    <<: *common-config
+    profiles: ["arm64"]
+    platform: linux/arm64
+    image: yutianchen/co-me:linux-cu126-orin-arm64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: "nvcr.io/nvidia/pytorch:25.03-py3-igpu"
+        CUDA_MAJOR_VERSION: "12"
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"
+
+    # Fix the libjpeg library problem for PyZed & Load stripped nsys
+    environment:
+      - PATH=/opt/nvidia/nsight-systems/2024.5.4/bin:/opt/nvidia/nsight-compute/2024.3.1/bin:$PATH
+      - LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu/tegra:${LD_LIBRARY_PATH:-}
+    
+    volumes:
+      - ../:/workspace
+      - /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra
+      - /usr/lib/aarch64-linux-gnu/libjpeg.so.8:/usr/lib/aarch64-linux-gnu/libjpeg.so.8
+      - /opt/nvidia/nsight-systems/:/opt/nvidia/nsight-systems/
+      - /opt/nvidia/nsight-compute/:/opt/nvidia/nsight-compute/
+
+  dev-unified-entry:
+    <<: *common-config
+
+    image: ${DEV_IMAGE}
+    platform: ${DEV_PLATFORM}
+    container_name: co-me-unified-dev
+    command: sleep infinity
+    # Expose network port for rerun visualizer
+    ports:
+      - "9876:9876"

@@ -1,0 +1,15 @@
+defaults:
+  - dataset: custom_video
+  - model  : vggt
+  - render : image
+  - _self_
+
+device  : cuda
+first_n : null
+output_directory: ${hydra:runtime.output_dir}
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: output/infer/${hydra:runtime.choices.model}/${now:%Y%m%d_%H%M%S}

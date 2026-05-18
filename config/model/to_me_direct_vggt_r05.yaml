@@ -1,0 +1,15 @@
+_target_: src.accelerate.instantiate_accelerated_model
+_recursive_: False
+
+token_merger:
+  _target_   : src.accelerate.token_merger.to_me.ToMe_TokenMerger
+  merge_ratio: 0.5
+
+
+accelerate_func:
+  _target_: src.accelerate.vggt.direct_accelerate
+  encoder_layer : 0
+  use_attn_bias_correction: false
+
+target_model:
+  _target_: src.thirdparty.vggt.get_VGGT

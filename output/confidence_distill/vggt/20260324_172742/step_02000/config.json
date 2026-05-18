@@ -1,0 +1,32 @@
+{
+  "train_target": "Distill_DepthConf",
+  "learning_rate": 0.001,
+  "weight_decay": 0.01,
+  "inject_block_idx": 14,
+  "predictor_dims": [
+    1024,
+    128,
+    1
+  ],
+  "predictor_active": "expp1",
+  "predictor_num_register": 0,
+  "batch_size": 32,
+  "mini_batch_size": 8,
+  "num_step": 2000,
+  "segment_length": 32,
+  "infer_size": [
+    518,
+    518
+  ],
+  "loss_function": "pairwise-rank",
+  "permute_segment": true,
+  "crop_segment": true,
+  "train_dtype": "torch.bfloat16",
+  "output_directory": "output/confidence_distill/vggt/20260324_172742",
+  "save_frequency": 500,
+  "use_wandb": true,
+  "wandb_group": "default",
+  "wandb_entity": "yutianch_cmu",
+  "wandb_project": "CoMe-Next Confidence Distillation",
+  "resume_from": "output/confidence_distill/vggt/20260324_172742/step_01215"
+}

@@ -12,21 +12,13 @@
 </p>
 
 ## 🔥 Updates
-
-> [!NOTE]
->
-> We are planning to release a new iteration of the repository, providing acceleration on more state-of-the-art geometric vision transformers including: **DepthAnything 3, Pi3, Pi3X.**
-> In addition, the speedup is further boosted with **customized FlashAttention kernel** (no annoying JIT compile and warmup anymore!) with higher token copmression rate. We are also working on a **TensorRT plugin** for custom kernels to maximize the efficiency on edge platforms.
->
-> If you are interested, please ⭐ our repo and stay tuned!
-
 * [Feb 2026] Our work is accepted by the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026. We will present our work at CVPR 2026 in Denver.
 
 ## 📦 Environment & Installation
 
 > [!NOTE]
-> 
-> We do not provide pre-compiled kernels, you **must compile and install the CUDA kernel** manually. 
+>
+> We do not provide pre-compiled kernels, you **must compile and install the CUDA kernels** manually.
 >
 > It is recommended to use the provided Docker images to simplify the workflow.
 
@@ -42,94 +34,125 @@
 
 > Legend: ✅: Verified support, ❓: Unverified but should support, ❌ Unsupported.
 
+### Get the Source
+
+The FlashAttention kernel is built against NVIDIA CUTLASS, which is vendored as a git submodule. Clone with submodules:
+
+```bash
+git clone --recursive <repository-url>
+# or, for an existing clone:
+git submodule update --init src/cuda_extension/cutlass
+```
+
 ### Docker Environment Setup (Recommended 👍)
 
-We provide the pre-built docker image at [Docker Hub (Link)](https://hub.docker.com/r/yutianchen/co-me-tokens).  
+Pre-built images are published on [Docker Hub](https://hub.docker.com/r/yutianchen/co-me). The Docker configuration lives in `docker/`.
+
+1. **Configure the toolchain** — installs git hooks and writes the Docker `.env`:
+
+   ```bash
+   bash tools/setup.sh
+   ```
+
+2. **Build (or pull) the image** — `docker/compose.sh` wraps `docker compose` and auto-selects the `amd64` / `arm64` profile for your host:
+
+   ```bash
+   cd docker && bash compose.sh build
+   ```
+
+   `docker/docker-compose.yaml` defines one dev service per CUDA version — `linux-cuda126-dev`, `linux-cuda128-dev`, `linux-cuda130-dev` (x86-64) and `jetson-thor-dev`, `jetson-orin-dev` (ARM64).
+
+3. **Mount your datasets** — edit `tools/docker-compose.user.yaml` to bind-mount dataset directories into the container.
+
+4. **Enter the dev container** — `tools/dev.sh` opens an interactive shell in the dev container, with the repository and your dataset mounts attached:
+
+   ```bash
+   bash tools/dev.sh
+   ```
+
+Build the CUDA kernels inside this container as described below.
+
+### Conda / Virtual Environment Setup
+
+If you are on Windows or prefer a virtual environment, install the Python dependencies with:
 
 ```bash
-# On Linux Platform (x86-64)
-# This will automatically launch image with proper CUDA version.
-cd Env/Linux && bash ./start_interact.sh
-bash ./install_CUExt.sh
+pip install -r docker/requirements.txt
 ```
+
+A CUDA-enabled PyTorch build must already be present in the environment (the Docker images are based on the NVIDIA NGC PyTorch containers, which ship PyTorch).
+
+### Building the CUDA Kernels
+
+`tools/setup.sh` drives the kernel build. Run `bash tools/setup.sh --help` to list the available features:
 
 ```bash
-# On Jetson L4T Platform (ARM64)
-cd Env/L4T && bash ./start_interact.sh
-bash ./install_CUExt.sh
+bash tools/setup.sh cuext flash      # build the Co-Me token-merge + FlashAttention kernels
 ```
 
-### Conda Environment Setup
+- `cuext` — Co-Me token-merge kernel (`src/cuda_extension/co_me`)
+- `flash` — Co-Me FlashAttention kernel (`src/cuda_extension/flash_attn`)
+- `zedloader` — optional Stereolabs ZED camera loader
 
-If you are on the Windows platform or prefer using virtual environment instead you can also use the `requirements.txt` in `./Env/<Platform>`.
-
-#### Installing CUDA Kernels on Linux
-
-Simply run
+Each extension can also be built directly via its own `install.sh`:
 
 ```bash
-bash install_CUExt.sh
+bash src/cuda_extension/co_me/install.sh
+bash src/cuda_extension/flash_attn/install.sh
 ```
 
-#### Installing CUDA Kernels on Windows
+#### Building on Windows
 
-For **Windows** platform user, to install the CUDA kernel you need to launch the *Developer Powershell for VS 2022* (or equivalent), activate the virtual environment, and run 
+On **Windows**, launch the *Developer PowerShell for VS 2022* (or equivalent), activate your environment, and build each extension in place:
 
 ```powershell
-PS> cd CUExt/CUDAExtension
+PS> cd src\cuda_extension\co_me
+PS> python setup.py build_ext --inplace -f
+PS> cd ..\flash_attn
 PS> python setup.py build_ext --inplace -f
 ```
 
-### Checkpoint
+### Checkpoints
 
-The checkpoint is already shipped with the git repository in `Model` directory. **No additional download is required.**
+The confidence-predictor checkpoints ship with the repository under `output/confidence_distill/`. Each Co-Me model config (`config/model/co_me_*.yaml`) points at the appropriate checkpoint through its `ckpt_path` field — **no additional download is required.**
 
-## 🚀 Quick Start: Measure Model Runtime
+## 🚀 Quick Start: Runtime Benchmark
 
-1. Measure runtime of VGGT @ 32 frames
-    
-    ```bash
-    $ python -m Eval.vggt_accelerate_ratio vggt 32
-    ```
+`python -m src.bench` measures the inference latency of a reference model and its Co-Me–accelerated counterpart back-to-back, on synthetic input (no dataset download required):
 
-2. Measure runtime of Co-Me Accelerated VGGT @ 32 frames
-    
-    ```bash
-    $ python -m Eval.vggt_accelerate_ratio ours 32
-    ```
+```bash
+# Default: VGGT vs. Co-Me accelerated VGGT
+$ python -m src.bench
 
-3. Measure runtime of MapAnything @ 32 frames
+ Name                Count   Median (ms)   P90 (ms)   P99 (ms) 
+───────────────────────────────────────────────────────────────
+ Reference Model        10       6671.10    6719.05    6958.61 
+ Accelerated Model      10       1319.27    1337.53    1405.01
+```
 
-    ```bash
-    $ python -m Eval.mapanything_accelerate_ratio ma 32
-    ```
+```
+# Benchmark another backbone, e.g. MapAnything
+python -m src.bench model@ref=ma model@acc=co_me_fused_ma_3x3
+```
 
-4. Measure runtime of Co-Me Accelerated MapAnything @ 32 frames
+The reference model, accelerated model, input dataset, and sample count are configured in `config/bench.yaml`.
 
-    ```bash
-    $ python -m Eval.mapanything_accelerate_ratio ours 32
-    ```
-
->[!NOTE]
-> All metrics reported on paper were measured on NVIDIA A100 PCIe 80G, benchmarking on different GPU models may yield different results.
+> [!NOTE]
+> All metrics reported in the paper were measured on an NVIDIA H100 HBM3 80G. Benchmarking on a different GPU model may yield different results.
 
 ## 🛠️ Model Evaluation
 
-We released the depth evaluation pipeline for VGGT (`VGGT`, `VGGT*` and `ours`) used in Table 1 and 2 in the paper. To run this pipeline you can use
+We release the depth evaluation pipeline used in the paper. `python -m src.evaluate` runs a Co-Me accelerated model against its reference and reports depth metrics (L1 error, δ₁.₂₅ accuracy) alongside latency:
 
 ```bash
-# VGGT evaluation and benchmarking
-python -m Eval.vggt_depth --dataset dtu-mvs --seq_l 32 vggt
-
-# VGGT* evaluation and benchmarking
-python -m Eval.vggt_depth --dataset dtu-mvs --seq_l 32 vggt*
-
-# Co-Me accelerated VGGT evaluation and benchmarking
-python -m Eval.vggt_depth --dataset dtu-mvs --seq_l 32 ours \
-    --grp_size 4 \
-    --mask_setup bot-p 0.5 \
-    --accelerator ./Model/VGGT_Accelerator/checkpoint.pth
+python -m src.evaluate model@acc=co_me_fused_vggt_3x3 model@ref=vggt evaluate.target=depth dataset=dtu_mvs
 ```
+
+- `model@ref` — reference model: `vggt`, `vggt_star`, `fastvggt`, `to_me_direct_vggt_r05`, `pi3`, `pi3x`, `da3`, `ma`
+- `model@acc` — Co-Me accelerated model: see `config/model/co_me_*.yaml`
+- `dataset` — evaluation dataset, e.g. `dtu_mvs` (see `config/dataset/`)
+
+To run a model on your own images, video, or live camera, use `python -m src.infer` together with one of the `custom_*` dataset configs (`config/dataset/custom_{image,video,camera}.yaml`).
 
 ## 📋Citation / BibTex
 

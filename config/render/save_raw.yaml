@@ -1,0 +1,5 @@
+_target_: src.render.SaveNPZRenderer
+
+config:
+  include_input_images: true
+  include_input_intrinsics: true

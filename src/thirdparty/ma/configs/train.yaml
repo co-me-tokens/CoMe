@@ -1,0 +1,6 @@
+defaults:
+  - machine: default
+  - model: mapanything
+  - _self_
+
+output_dir: ${hydra:run.dir}

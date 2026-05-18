@@ -1,0 +1,5 @@
+_target_: src.dataset.fake_input.FakeInput_Dataset
+
+length         : 10
+sequence_length: 32
+device         : ${device}

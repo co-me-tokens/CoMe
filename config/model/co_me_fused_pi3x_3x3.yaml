@@ -1,0 +1,17 @@
+_target_: src.accelerate.instantiate_accelerated_model
+_recursive_: False
+token_merger:
+  _target_: src.accelerate.token_merger.co_me.CoMe_TokenMerger
+
+  group_size    : 4
+  threshold     : 0.5
+  ckpt_path     : output/confidence_distill/pi3x/20260324_173744/step_02000
+  device        : ${device}
+
+accelerate_func:
+  _target_: src.accelerate.pi3.fused_accelerate
+  encoder_layer : 14
+  use_attn_bias_correction: true
+
+target_model:
+  _target_: src.thirdparty.pi3.get_Pi3X

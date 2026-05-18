@@ -1,0 +1,6 @@
+_target_: src.dataset.tartanair_v1.AllTartanAirv1_Dataset
+
+data_root     : /data/tartanair_v1
+segment_length: 32
+step          : 1
+device        : ${device}

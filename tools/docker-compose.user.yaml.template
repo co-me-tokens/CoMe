@@ -1,0 +1,7 @@
+# COPY THIS FILE TO docker-compose.user.yaml
+# AND FILL IN THE VOLUMES WITH DATAPATH YOU WANT TO MOUNT TO DEV CONTAINER.
+
+services:
+  dev-unified-entry:
+    volumes:
+      - PATH_ON_HOST:PATH_IN_CONTAINER

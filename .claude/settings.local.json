@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -v src/infer_trt.py src/infer_vggtslam.py src/analyze_correlate.py config/analyze_correlate.yaml src/accelerate/vggt/tensorrt.py src/utility/tensorrt.py src/cuda_extension/flash_attn/trt_plugin.py src/cuda_extension/flash_attn/trt_plugin.cpp test/auto_test/test_trt_compile_jagged_block.py test/auto_test/test_tensorrt_dtype_handling.py test/auto_test/test_vggt_flattened.py test/benchmark/bench_trt_block.py docs/trt_progress.md src/metrics/point.py src/metrics/pose.py src/metrics/mask.py src/scripts/plot_analyze_correlation.py)",
+      "Bash(rm -rvf tools/types/tensorrt tools/types/tensorrt_bindings)",
+      "Bash(rm -fv src/accelerate/__pycache__/*)"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+"""JaggedAttention — flash_attn-backed attention for variable-length sequences."""
+
+import torch
+from typing import Literal, TypeAlias
+
+from ....cuda_extension import flash_attn_varlen_qkvpacked_func
+from ....cuda_extension.flash_attn import infer_flash_attn_varlen_max_seqlen
+from ....thirdparty.vggt.layers.attention import Attention
+from ....interface.token_merger import ITokenMerger
+from ...common.qkv import prepare_packed_self_attention_qkv
+
+
+class JaggedAttention(torch.nn.Module):
+    SupportType: TypeAlias = Literal["fp16", "bf16"]
+    
+    def __init__(self, original_attn: Attention, run_dtype: SupportType):
+        super().__init__()
+        self.run_dtype: torch.dtype
+        match run_dtype:
+            case "bf16": self.run_dtype = torch.bfloat16
+            case "fp16": self.run_dtype = torch.float16
+            case _: raise ValueError(f"FlashAttention can only run on fp16/bf16, get {_}")
+        
+        self.attn = original_attn.to(dtype=self.run_dtype)
+
+    def forward(self, x: ITokenMerger.JaggedTokens, pos: torch.Tensor | None = None) -> ITokenMerger.JaggedTokens:
+        attn = self.attn
+        tokens = x.tokens.squeeze(0)                          # (P, C)
+        P, C = tokens.shape
+
+        qkv = attn.qkv(tokens)                                # (P, 3C)
+        qkv = qkv.reshape(P, 3, attn.num_heads, attn.head_dim)
+        qkv = prepare_packed_self_attention_qkv(
+            qkv=qkv,
+            q_norm=attn.q_norm,
+            k_norm=attn.k_norm,
+            rope=attn.rope,
+            pos=pos,
+            run_dtype=self.run_dtype,
+        )
+
+        cu_seqlens = x.offset.to(torch.int32)
+        max_seqlen = infer_flash_attn_varlen_max_seqlen(cu_seqlens)
+        dropout_p  = attn.attn_drop.p if self.training else 0.0
+
+        out: torch.Tensor = flash_attn_varlen_qkvpacked_func(     # type: ignore[assignment]
+            qkv, cu_seqlens, max_seqlen,
+            dropout_p=dropout_p, softmax_scale=attn.scale,
+        ) # (P, H, D)
+
+        out = out.reshape(P, C)
+        out = attn.proj(out)
+        out = attn.proj_drop(out)
+
+        return ITokenMerger.JaggedTokens(tokens=out.unsqueeze(0), weight=x.weight, offset=x.offset)

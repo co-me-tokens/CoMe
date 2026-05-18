@@ -1,0 +1,6 @@
+_target_: src.dataset.dtu_mvs.AllDTU_MVS_Dataset
+
+data_root     : /data/dtu_mvs/MVSNet_Preprocessed
+segment_length: 32
+lighting      : 3
+device        : ${device}

@@ -1,0 +1,7 @@
+_target_: src.dataset.custom_image.CustomImage_Dataset
+
+data_root : ./output/media/opera-house
+max_length: 32
+device    : ${device}
+step_size : 1
+start     : 0

@@ -1,0 +1,21 @@
+defaults:
+  - dataset  : dtu_mvs
+  - model@acc: co_me_fused_vggt_3x3
+  - model@ref: vggt
+  - _self_
+
+device: cuda
+
+evaluate:
+  target     : depth
+  align_scale: true
+  infer_size : [504, 504]
+  random_seed: 42
+
+  output_directory: ${hydra:runtime.output_dir}
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: output/evaluate_${evaluate.target}/${hydra:runtime.choices.dataset}/${hydra:runtime.choices.model@acc}___${hydra:runtime.choices.model@ref}/${now:%Y%m%d_%H%M%S}

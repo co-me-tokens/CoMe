@@ -1,0 +1,2 @@
+_target_: src.render.PlyRenderer
+subsample_ratio: 0.1
